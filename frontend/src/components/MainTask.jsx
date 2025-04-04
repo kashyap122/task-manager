@@ -19,7 +19,6 @@ const MainTask = ({ selectedUser }) => {
   const [editingTask, setEditingTask] = useState(null);
   const [users, setUsers] = useState([]);
   const [isAdmin, setIsAdmin] = useState(null);
-  // const [loggedInUser, setLoggedInUser] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -57,11 +56,11 @@ const MainTask = ({ selectedUser }) => {
 
   const fetchTasks = async () => {
     try {
-    //   const token = localStorage.getItem("token"); // Get the token from localStorage
-    // if (!token) {
-    //   console.error("No token found, please login again.");
-    //   return;
-    // }
+      //   const token = localStorage.getItem("token"); // Get the token from localStorage
+      // if (!token) {
+      //   console.error("No token found, please login again.");
+      //   return;
+      // }
       const response = await axios.get("http://localhost:3000/api/tasks/mytasks", {
         headers: { "Content-Type": "application/json", ...authHeader },
       });
@@ -163,10 +162,11 @@ const MainTask = ({ selectedUser }) => {
     try {
       await axios.post(
         `http://localhost:3000/api/tasks/delete/${taskId}`,
-        { authHeader }
+        {},  // empty data payload
+        { headers: { "Content-Type": "application/json", ...authHeader } }
       );
-      
-      
+
+
       fetchTasks();
       toast("Task deleted successfully!");
     } catch (error) {
@@ -192,8 +192,11 @@ const MainTask = ({ selectedUser }) => {
 
   const renderTaskCards = () => {
     return (
-      <Grid container spacing={2}>
-        {tasks.map((task) => (
+      <div>
+        <Grid container spacing={2}>
+          {tasks.map((task) => (
+          // const canEditOrDelete = isAdmin && (isAdmin.role === "admin" || task.assignedTo === isAdmin._id);
+          // return(
           <Grid item xs={12} sm={6} md={4} key={task._id}>
             <Card variant="outlined" sx={{ backgroundColor: '#d6eaf8' }} className='shadow-xl'>
               <CardContent>
@@ -218,22 +221,27 @@ const MainTask = ({ selectedUser }) => {
                 <Typography variant="body2" color="text.secondary">
                   <strong>Assigned By:</strong> {task.createdBy && typeof task.createdBy === "object" ? task.createdBy.username : task.createdBy}
                 </Typography>
-                <div style={{ marginTop: 10 }}>
-                  <EditSquareIcon
-                    onClick={() => handleEdit(task)}
-                    className='m-2 cursor-pointer'
-                  />
-                  <DeleteOutlineIcon
-                    onClick={() => handleDelete(task._id)}
-                    color="error"
-                    className="m-2 cursor-pointer"
-                  />
-                </div>
+                {/* {isAdmin?.role === "admin" && ( */}
+                {/* {canEditOrDelete ? ( */}
+                  <div style={{ marginTop: 10 }}>
+                    <EditSquareIcon
+                      onClick={() => handleEdit(task)}
+                      className='m-2 cursor-pointer'
+                    />
+                    <DeleteOutlineIcon
+                      onClick={() => handleDelete(task._id)}
+                      color="error"
+                      className="m-2 cursor-pointer"
+                    />
+                  </div>
+                  {/* ) : null} */}
               </CardContent>
             </Card>
           </Grid>
+          // );
         ))}
-      </Grid>
+        </Grid>
+      </div>
     );
   };
 
